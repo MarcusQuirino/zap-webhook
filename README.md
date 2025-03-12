@@ -20,6 +20,38 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## WhatsApp Webhook
+
+This project includes a webhook endpoint that receives WhatsApp messages and responds with "pong" for every message.
+
+### Setup Instructions
+
+1. Set up your WhatsApp Business API account at [Meta for Developers](https://developers.facebook.com/docs/whatsapp/cloud-api/get-started)
+2. Create a `.env.local` file with your WhatsApp API credentials:
+   ```
+   WHATSAPP_VERIFY_TOKEN=your_custom_verification_token
+   WHATSAPP_PHONE_NUMBER_ID=your_phone_number_id
+   WHATSAPP_ACCESS_TOKEN=your_access_token
+   ```
+3. Deploy your application or expose your local development server using a tool like [ngrok](https://ngrok.com/):
+   ```
+   ngrok http 3000
+   ```
+4. Set up the webhook URL in the WhatsApp Business Platform pointing to your `/api/webhook` endpoint
+   ```
+   https://your-domain.com/api/webhook
+   ```
+5. Use the same verification token you set in your `.env.local` file
+
+### How It Works
+
+When a user sends a message to your WhatsApp Business number, the webhook will:
+
+1. Receive the incoming message
+2. Extract the sender's phone number
+3. Respond with "pong" back to the sender
+4. Log the interaction in the console
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
