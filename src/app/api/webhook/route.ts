@@ -1,21 +1,47 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
-    try {
-        const data = await request.json();
-        console.log('Received webhook data:', JSON.stringify(data, null, 2));
+    const body = await request.json();
+    console.log('Received message:', body);
 
-        return NextResponse.json({
-            status: 'success',
-            message: 'Webhook received, but no messages found'
-        });
-    } catch (error) {
-        console.error('Error processing webhook:', error);
-        return NextResponse.json(
-            { status: 'error', message: 'Failed to process webhook' },
-            { status: 500 }
-        );
+    // Example: Extract sender's phone number and message ID
+    const senderPhoneNumberId = body.entry?.[0]?.changes?.[0]?.value?.messages?.[0]?.from;
+    const messageId = body.entry?.[0]?.changes?.[0]?.value?.messages?.[0]?.id;
+
+    console.log('message:', body.entry?.[0]?.changes?.[0]?.value?.messages?.[0]);
+    console.log('Sender phone number ID:', senderPhoneNumberId);
+    console.log('Message ID:', messageId);
+
+    if (senderPhoneNumberId) {
+        try {
+            const url = 'https://graph.facebook.com/v22.0/610897742100486/messages';
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer EAAHwcFnbmZA8BO38OlZBOtfyuRuVhptUbtvy7qyhY1TQlC2ZCCkMjqrQiZCVIZARobtYpGVGS06lgoOb62kIlR2zuv83omHOrMrkLDW9j85dLASL2T4OgCtnhc0Cr5iJyyrUS3SW5tagwJRLYZCbN0ZCyz0Lb0gQ3CrXdnLo8e5sUt6e19UzDa70w9AkFumZAtwAYe6EZCOXSowwsdSu2BJBohkOzEwYe0SxrrGEZD',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    messaging_product: 'whatsapp',
+                    to: '5551992941472',
+                    text: {
+                        body: 'pong'
+                    }
+                }),
+            });
+
+            if (!response.ok) {
+                console.error('Failed to send WhatsApp message:', await response.text());
+            }
+
+            const data = await response.json();
+            console.log('Sent message:', data);
+        } catch (error) {
+            console.error('Error sending WhatsApp message:', error);
+        }
     }
+
+    return NextResponse.json({ status: 'OK' });
 }
 
 // Verify webhook endpoint for initial setup with WhatsApp Business API
